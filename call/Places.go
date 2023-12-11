@@ -23,9 +23,13 @@ type Restaurant struct {
 }
 
 func CallPlaces(c echo.Context) error {
-	q := c.QueryParam("q")
+	// q := c.QueryParam("q")
+	lat := c.QueryParam("lat")
+	lng := c.QueryParam("lng")
+	location := lat + "," + lng
+	fmt.Println(location)
 
-	restaurants, err := getNearbyRestaurants(q)
+	restaurants, err := getNearbyRestaurants(location)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -49,16 +53,16 @@ func getNearbyRestaurants(location string) ([]Restaurant, error) {
 	}
 
 	apiKey := os.Getenv("API_KEY")
-	proxy := os.Getenv("PROXY_URL")
-
-	client.SetProxy(proxy)
+	// proxy := os.Getenv("PROXY_URL")
+	// client.SetProxy(proxy)
 
 	// Places APIにリクエストを送信
 	resp, err := client.R().
 		SetQueryParams(map[string]string{
 			"location": location,
 			"radius":   "500", // 検索半径（メートル）
-			"type":     "restaurant",
+			"types":     "restaurant",
+			"language": "ja",
 			"key":      apiKey,
 		}).
 		Get(placesAPIURL)
